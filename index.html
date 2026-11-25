@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<title>KONEΛT</title>
+
+<style>
+:root {
+  --bg:#000;
+  --white:#f7f7f7;
+  --muted:#a3a3a8;
+  --line:#414145;
+  --field:#050505;
+  --eye:#92949a;
+}
+* { box-sizing:border-box; }
+
+html,body {
+  width:100%;
+  height:100%;
+  margin:0;
+  background:var(--bg);
+  overflow:hidden;
+}
+
+body {
+  color:var(--white);
+  font-family:Inter,Roboto,"Segoe UI",Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+
+button,input { font:inherit; }
+button { cursor:pointer; }
+
+.app {
+  width:100%;
+  height:100vh;
+  height:100dvh;
+  position:relative;
+  overflow:hidden;
+  background:#000;
+}
+
+.screen {
+  display:none;
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  padding:
+    max(28px,env(safe-area-inset-top))
+    8.1%
+    calc(75px + env(safe-area-inset-bottom));
+  overflow:hidden;
+  flex-direction:column;
+}
+
+.screen.active { display:flex; }
+
+/* RODAPÉ */
+
+.footer {
+  position:absolute;
+  z-index:10;
+  bottom:max(22px,env(safe-area-inset-bottom));
+  left:0;
+  width:100%;
+  text-align:center;
+  color:#aaa;
+  font-size:13px;
+  letter-spacing:.3px;
+  pointer-events:none;
+}
+
+/* LOGIN */
+
+#loginScreen {
+  justify-content:center;
+}
+
+.login-decoration {
+  position:absolute;
+  z-index:0;
+  width:390px;
+  height:390px;
+  border-radius:50%;
+  border:1px solid rgba(255,255,255,.07);
+  background:radial-gradient(
+    circle at 35% 35%,
+    rgba(255,255,255,.055),
+    transparent 68%
+  );
+  pointer-events:none;
+}
+
+.login-decoration.top {
+  top:-250px;
+  left:-110px;
+}
+
+.login-decoration.bottom {
+  bottom:-265px;
+  right:-190px;
+}
+
+.form-area {
+  position:relative;
+  z-index:1;
+  width:100%;
+  max-width:560px;
+  margin:auto;
+}
+
+.brand {
+  text-align:center;
+  margin-bottom:38px;
+}
+
+.brand-name {
+  font-size:clamp(28px,7vw,38px);
+  font-weight:800;
+  letter-spacing:1.2px;
+  line-height:1;
+}
+
+.brand-tag {
+  margin-top:17px;
+  color:#aaa;
+  font-size:14px;
+  letter-spacing:6px;
+}
+
+.field {
+  display:block;
+  margin-bottom:27px;
+}
+
+.field-label {
+  display:block;
+  font-size:16px;
+  font-weight:600;
+  margin:0 0 12px 1px;
+}
+
+.input-wrap { position:relative; }
+
+.field input,
+.code-input {
+  width:100%;
+  height:59px;
+  border:1px solid var(--line);
+  border-radius:999px;
+  color:var(--white);
+  background:var(--field);
+  outline:none;
+  padding:0 20px;
+  font-size:16px;
+  transition:border-color .16s;
+}
+
+.field input::placeholder,
+.code-input::placeholder {
+  color:#85858b;
+  opacity:1;
+}
+
+.field input:focus,
+.code-input:focus {
+  border-color:#bdbdc2;
+}
+
+.has-toggle input { padding-right:60px; }
+
+/* OLHO SVG CINZA */
+
+.eye {
+  position:absolute;
+  top:50%;
+  right:13px;
+  transform:translateY(-50%);
+  width:38px;
+  height:38px;
+  display:grid;
+  place-items:center;
+  border:0;
+  background:transparent;
+  color:var(--eye);
+  padding:5px;
+}
+
+.eye svg {
+  width:25px;
+  height:25px;
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.primary {
+  width:100%;
+  min-height:59px;
+  border:0;
+  border-radius:999px;
+  background:#fff;
+  color:#050505;
+  font-weight:750;
+  font-size:17px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:15px;
+  margin-top:8px;
+}
+
+.primary:active { transform:scale(.985); }
+
+.arrow {
+  font-size:27px;
+  line-height:.7;
+  font-weight:400;
+}
+
+.divider {
+  display:flex;
+  align-items:center;
+  gap:14px;
+  color:#aaa;
+  margin:25px 0 27px;
+  font-size:16px;
+}
+
+.divider::before,
+.divider::after {
+  content:"";
+  height:1px;
+  flex:1;
+  background:#555;
+}
+
+.google {
+  min-height:59px;
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:999px;
+  background:transparent;
+  color:#f2f2f2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+  font-size:16px;
+}
+
+.google-mark {
+  font-size:28px;
+  font-weight:800;
+  background:conic-gradient(
+    from -45deg,
+    #4285f4 0deg 90deg,
+    #34a853 90deg 180deg,
+    #fbbc05 180deg 270deg,
+    #ea4335 270deg 360deg
+  );
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+.google-separator {
+  height:28px;
+  width:1px;
+  background:#555;
+}
+
+/* LINKS DO LOGIN */
+
+.login-links {
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:13px;
+  margin-top:37px;
+}
+
+.text-link {
+  padding:2px 0;
+  border:0;
+  background:transparent;
+  color:#aaa;
+  text-decoration:underline;
+  text-underline-offset:5px;
+  font-size:15px;
+}
+
+.dot { color:#aaa; }
+
+/* TELAS INTERNAS */
+
+.back {
+  align-self:flex-start;
+  display:inline-flex;
+  align-items:center;
+  gap:12px;
+  margin:20px 0 0;
+  padding:4px 0;
+  border:0;
+  background:transparent;
+  color:#eee;
+  font-size:15px;
+  flex-shrink:0;
+}
+
+.back-arrow {
+  font-size:30px;
+  line-height:.7;
+  font-weight:300;
+}
+
+.content {
+  width:100%;
+  max-width:560px;
+  margin:auto;
+  padding:20px 0;
+}
+
+.heading {
+  text-align:center;
+  margin:0 0 45px;
+}
+
+.heading h1 {
+  margin:0 0 12px;
+  font-size:clamp(23px,6vw,31px);
+  line-height:1.2;
+  font-weight:750;
+}
+
+.heading p {
+  margin:0;
+  color:#c1c1c6;
+  font-size:16px;
+  line-height:1.5;
+}
+
+.internal-fields .field {
+  margin-bottom:25px;
+}
+
+.internal-fields .field-label {
+  font-size:16px;
+  margin-bottom:12px;
+}
+
+.internal-fields .field input { height:57px; }
+
+.rule {
+  height:1px;
+  width:100%;
+  background:#555;
+  margin:24px 0;
+}
+
+.recovery-shortcut {
+  text-align:center;
+  color:#ddd;
+  font-size:15px;
+  line-height:1.7;
+}
+
+.recovery-shortcut .text-link {
+  color:#eee;
+  margin-left:7px;
+}
+
+.code-input {
+  height:58px;
+  border:0;
+  border-bottom:2px solid #eee;
+  border-radius:0;
+  padding:0 8px;
+  background:transparent;
+  font-size:20px;
+  letter-spacing:7px;
+}
+
+.code-input:focus {
+  border-color:#fff;
+  box-shadow:none;
+}
+
+.code-content .heading { margin-bottom:60px; }
+.code-content .primary { margin-top:65px; }
+
+.resend {
+  text-align:center;
+  margin:32px 0 0;
+  color:#c4c4ca;
+  font-size:15px;
+  line-height:1.6;
+}
+
+.resend .text-link {
+  color:#eee;
+  font-size:15px;
+}
+
+/* AVISOS */
+
+.notice {
+  display:none;
+  width:100%;
+  margin:0 auto 18px;
+  padding:12px 15px;
+  border-radius:12px;
+  font-size:14px;
+  line-height:1.45;
+  border:1px solid transparent;
+}
+
+.notice.show { display:block; }
+
+.notice.error {
+  color:#ff8585;
+  border-color:rgba(255,133,133,.35);
+  background:rgba(255,133,133,.08);
+}
+
+.notice.success {
+  color:#8ee0b1;
+  border-color:rgba(142,224,177,.3);
+  background:rgba(142,224,177,.07);
+}
+
+/* AJUSTE PARA TELAS MENORES */
+
+@media(max-height:750px) {
+  .brand { margin-bottom:23px; }
+  .field { margin-bottom:17px; }
+  .login-links { margin-top:22px; }
+  .divider { margin:17px 0; }
+  .heading { margin-bottom:28px; }
+  .internal-fields .field { margin-bottom:17px; }
+  .content { padding:10px 0; }
+  .code-content .heading { margin-bottom:30px; }
+  .code-content .primary { margin-top:35px; }
+  .resend { margin-top:20px; }
+}
+
+@media(max-height:650px) {
+  .screen {
+    padding-top:18px;
+    padding-bottom:65px;
+  }
+  .brand-name { font-size:27px; }
+  .brand-tag { margin-top:9px; }
+  .field-label { margin-bottom:7px; }
+  .field input { height:49px; }
+  .primary,.google { min-height:49px; }
+  .heading h1 { font-size:22px; }
+  .heading p { font-size:14px; }
+  .back { margin-top:5px; }
+  .footer { font-size:11px; }
+}
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<!-- LOGIN -->
+
+<section class="screen active" id="loginScreen">
+
+<span class="login-decoration top"></span>
+<span class="login-decoration bottom"></span>
+
+<div class="form-area">
+
+<header class="brand">
+<div class="brand-name">KONEΛT</div>
+<div class="brand-tag">O COMEÇO</div>
+</header>
+
+<div class="notice" id="noticeLogin" role="status"></div>
+
+<form id="loginForm">
+
+<label class="field">
+<span class="field-label">E-mail</span>
+<input id="loginEmail" type="email"
+placeholder="Digite seu e-mail." required>
+</label>
+
+<label class="field">
+<span class="field-label">Senha</span>
+<span class="input-wrap has-toggle">
+<input id="loginPassword" type="password"
+placeholder="Digite sua senha." required>
+<button class="eye" type="button"
+data-toggle="loginPassword"
+aria-label="Mostrar senha"></button>
+</span>
+</label>
+
+<button class="primary" type="submit">
+ENTRAR <span class="arrow">→</span>
+</button>
+
+</form>
+
+<div class="divider">Ou</div>
+
+<button class="google" type="button" id="googleButton">
+<span class="google-mark">G</span>
+<span class="google-separator"></span>
+<span>Continuar com Google</span>
+</button>
+
+<nav class="login-links">
+<button class="text-link" type="button"
+data-go="signupScreen">Criar nova conta</button>
+<span class="dot">•</span>
+<button class="text-link" type="button"
+data-go="recoveryScreen">Recuperar acesso</button>
+</nav>
+
+</div>
+
+<div class="footer">© 2027 Systendance.</div>
+</section>
+
+
+<!-- CADASTRO -->
+
+<section class="screen" id="signupScreen">
+
+<button class="back" type="button" data-go="loginScreen">
+<span class="back-arrow">←</span> Voltar ao login
+</button>
+
+<div class="content">
+
+<div class="heading">
+<h1>CRIE SUA CONTA</h1>
+<p>Preencha com seus dados, enviaremos um código para confirmação.</p>
+</div>
+
+<div class="notice" id="noticeSignup"></div>
+
+<form id="signupForm" class="internal-fields">
+
+<label class="field">
+<span class="field-label">Nome de usuário</span>
+<input id="signupUsername" placeholder="Crie um @usuário" required>
+</label>
+
+<label class="field">
+<span class="field-label">E-mail</span>
+<input id="signupEmail" type="email"
+placeholder="Digite seu e-mail" required>
+</label>
+
+<label class="field">
+<span class="field-label">Número de celular (opcional)</span>
+<input id="signupPhone" type="tel"
+placeholder="(00) 00000-0000">
+</label>
+
+<label class="field">
+<span class="field-label">Criar nova senha</span>
+<span class="input-wrap has-toggle">
+<input id="signupPassword" type="password"
+minlength="8" placeholder="Crie uma senha (mín. 8 caracteres)" required>
+<button class="eye" type="button"
+data-toggle="signupPassword"></button>
+</span>
+</label>
+
+<button class="primary" type="submit">
+CONTINUAR <span class="arrow">→</span>
+</button>
+
+</form>
+</div>
+
+<div class="footer">© 2027 Systendance.</div>
+</section>
+
+
+<!-- RECUPERAR ACESSO -->
+
+<section class="screen" id="recoveryScreen">
+
+<button class="back" type="button" data-go="loginScreen">
+<span class="back-arrow">←</span> Voltar ao login
+</button>
+
+<div class="content">
+
+<div class="heading">
+<h1>RECUPERE SEU ACESSO</h1>
+<p>Você receberá um código para confirmar seu e-mail.</p>
+</div>
+
+<div class="notice" id="noticeRecovery"></div>
+
+<form id="recoveryForm" class="internal-fields">
+
+<label class="field">
+<span class="field-label">E-mail ou Número</span>
+<input id="recoveryIdentity"
+placeholder="E-mail ou número com DDD" required>
+</label>
+
+<button class="primary" type="submit">
+ENVIAR CÓDIGO <span class="arrow">→</span>
+</button>
+
+</form>
+
+<div class="rule"></div>
+
+<div class="recovery-shortcut">
+Deseja alterar sua senha?
+<button class="text-link" type="button"
+data-go="resetScreen">Redefinir senha</button>
+</div>
+
+</div>
+
+<div class="footer">© 2027 Systendance.</div>
+</section>
+
+
+<!-- VERIFICAÇÃO -->
+
+<section class="screen" id="verifyScreen">
+
+<button class="back" type="button" id="verifyBack">
+<span class="back-arrow">←</span> Voltar
+</button>
+
+<div class="content code-content">
+
+<div class="heading">
+<h1 id="verifyTitle">CONFIRME SEU E-MAIL</h1>
+<p id="verifyDescription">
+Enviaremos um código de confirmação para seu e-mail.
+</p>
+</div>
+
+<div class="notice" id="noticeVerify"></div>
+
+<label class="field">
+<span class="field-label">Digite o código</span>
+<input class="code-input" id="verificationCode"
+inputmode="numeric" maxlength="6"
+placeholder="Digite o código" required>
+</label>
+
+<button class="primary" type="button" id="verifyButton">
+VERIFICAR CÓDIGO
+</button>
+
+<p class="resend">
+Não recebeu nenhum código?
+<button class="text-link" type="button" id="resendCode">
+Reenviar código
+</button>
+</p>
+
+</div>
+
+<div class="footer">© 2027 Systendance.</div>
+</section>
+
+
+<!-- REDEFINIR SENHA -->
+
+<section class="screen" id="resetScreen">
+
+<button class="back" type="button" id="resetBack">
+<span class="back-arrow">←</span> Voltar
+</button>
+
+<div class="content">
+
+<div class="heading">
+<h1>REDEFINIR SENHA</h1>
+<p>Informe sua nova senha e confirme para continuar.</p>
+</div>
+
+<div class="notice" id="noticeReset"></div>
+
+<form id="resetForm" class="internal-fields">
+
+<label class="field">
+<span class="field-label">Nova senha</span>
+<span class="input-wrap has-toggle">
+<input id="newPassword" type="password"
+minlength="8" placeholder="Digite sua nova senha" required>
+<button class="eye" type="button"
+data-toggle="newPassword"></button>
+</span>
+</label>
+
+<label class="field">
+<span class="field-label">Confirmar nova senha</span>
+<span class="input-wrap has-toggle">
+<input id="confirmPassword" type="password"
+placeholder="Digite novamente sua senha" required>
+<button class="eye" type="button"
+data-toggle="confirmPassword"></button>
+</span>
+</label>
+
+<button class="primary" type="submit">
+SALVAR SENHA <span class="arrow">→</span>
+</button>
+
+</form>
+
+<div class="rule"></div>
+
+</div>
+
+<div class="footer">© 2027 Systendance.</div>
+</section>
+
+</div>
+
+
+<script>
+const screenIds = [
+  'loginScreen',
+  'signupScreen',
+  'recoveryScreen',
+  'verifyScreen',
+  'resetScreen'
+];
+
+let verificationFlow = 'signup';
+let verificationReturn = 'signupScreen';
+let recoveryReturn = 'recoveryScreen';
+let verificationTarget = '';
+
+function showScreen(id) {
+  screenIds.forEach(screenId => {
+    document.getElementById(screenId)
+      .classList.toggle('active', screenId === id);
+  });
+  clearNotices();
+}
+
+function showNotice(screen, message, type='success') {
+  const box = document.getElementById('notice' + screen);
+  if (!box) return;
+  box.textContent = message;
+  box.className = 'notice show ' + type;
+}
+
+function clearNotices() {
+  document.querySelectorAll('.notice').forEach(box => {
+    box.textContent = '';
+    box.className = 'notice';
+  });
+}
+
+function startVerification(kind,target) {
+  verificationFlow = kind;
+  verificationReturn =
+    kind === 'signup' ? 'signupScreen' : 'recoveryScreen';
+
+  verificationTarget = target;
+
+  document.getElementById('verifyTitle').textContent =
+    kind === 'signup'
+    ? 'CONFIRME SEU E-MAIL'
+    : 'CONFIRME SEU ACESSO';
+
+  document.getElementById('verifyDescription').textContent =
+    kind === 'signup'
+    ? 'Enviaremos um código de confirmação para ' + target + '.'
+    : 'Enviaremos um código de recuperação para ' + target + '.';
+
+  document.getElementById('verificationCode').value = '';
+  showScreen('verifyScreen');
+}
+
+document.querySelectorAll('[data-go]').forEach(button => {
+  button.addEventListener('click', () => {
+    showScreen(button.dataset.go);
+  });
+});
+
+/* LOGIN */
+
+document.getElementById('loginForm')
+.addEventListener('submit', event => {
+  event.preventDefault();
+
+  showNotice(
+    'Login',
+    'Acesso recebido. A autenticação da conta será concluída pelo serviço de acesso.'
+  );
+});
+
+document.getElementById('googleButton')
+.addEventListener('click', () => {
+  showNotice(
+    'Login',
+    'A opção de acesso com Google está disponível visualmente.'
+  );
+});
+
+/* CADASTRO */
+
+document.getElementById('signupForm')
+.addEventListener('submit', event => {
+  event.preventDefault();
+
+  const username =
+    document.getElementById('signupUsername').value.trim();
+
+  const email =
+    document.getElementById('signupEmail').value.trim();
+
+  const password =
+    document.getElementById('signupPassword').value;
+
+  if (username.length < 3) {
+    return showNotice(
+      'Signup',
+      'O nome de usuário precisa ter pelo menos 3 caracteres.',
+      'error'
+    );
+  }
+
+  if (password.length < 8) {
+    return showNotice(
+      'Signup',
+      'Crie uma senha com pelo menos 8 caracteres.',
+      'error'
+    );
+  }
+
+  startVerification('signup',email);
+});
+
+/* RECUPERAÇÃO */
+
+document.getElementById('recoveryForm')
+.addEventListener('submit', event => {
+  event.preventDefault();
+
+  const identity =
+    document.getElementById('recoveryIdentity').value.trim();
+
+  startVerification('recovery',identity);
+});
+
+/* VERIFICAÇÃO */
+
+document.getElementById('verifyBack')
+.addEventListener('click', () => {
+  showScreen(verificationReturn);
+});
+
+document.getElementById('verificationCode')
+.addEventListener('input', event => {
+  event.target.value =
+    event.target.value.replace(/\D/g,'').slice(0,6);
+});
+
+document.getElementById('resendCode')
+.addEventListener('click', () => {
+  showNotice(
+    'Verify',
+    'Solicitação de reenvio recebida.'
+  );
+});
+
+document.getElementById('verifyButton')
+.addEventListener('click', () => {
+  const code =
+    document.getElementById('verificationCode').value.trim();
+
+  if (code.length !== 6) {
+    return showNotice(
+      'Verify',
+      'Digite os seis números do código.',
+      'error'
+    );
+  }
+
+  if (verificationFlow === 'signup') {
+    showScreen('loginScreen');
+    showNotice(
+      'Login',
+      'Cadastro confirmado. Você já pode continuar.'
+    );
+  } else {
+    recoveryReturn = 'verifyScreen';
+    showScreen('resetScreen');
+  }
+});
+
+/* REDEFINIR SENHA */
+
+document.getElementById('resetBack')
+.addEventListener('click', () => {
+  showScreen(
+    verificationFlow === 'recovery' &&
+    recoveryReturn === 'verifyScreen'
+    ? 'verifyScreen'
+    : 'recoveryScreen'
+  );
+});
+
+document.getElementById('resetForm')
+.addEventListener('submit', event => {
+  event.preventDefault();
+
+  const password =
+    document.getElementById('newPassword').value;
+
+  const confirmation =
+    document.getElementById('confirmPassword').value;
+
+  if (password.length < 8) {
+    return showNotice(
+      'Reset',
+      'Use uma senha com pelo menos 8 caracteres.',
+      'error'
+    );
+  }
+
+  if (password !== confirmation) {
+    return showNotice(
+      'Reset',
+      'As senhas não coincidem.',
+      'error'
+    );
+  }
+
+  event.target.reset();
+
+  showScreen('loginScreen');
+
+  showNotice(
+    'Login',
+    'Sua nova senha foi aceita.'
+  );
+});
+
+/* OLHOS SVG */
+
+const eyeOpen = `
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/>
+<circle cx="12" cy="12" r="3.2"/>
+</svg>`;
+
+const eyeClosed = `
+<svg viewBox="0 0 24 24" aria-hidden="true">
+<path d="M3 3l18 18"/>
+<path d="M10.6 5.2A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a15 15 0 0 1-3.1 3.8"/>
+<path d="M6.2 6.3C3.5 8.1 2 12 2 12s3.6 7 10 7c1.5 0 2.8-.4 4-1"/>
+</svg>`;
+
+document.querySelectorAll('[data-toggle]').forEach(button => {
+  button.innerHTML = eyeOpen;
+
+  button.addEventListener('click', () => {
+    const field =
+      document.getElementById(button.dataset.toggle);
+
+    const visible = field.type === 'text';
+
+    field.type = visible ? 'password' : 'text';
+
+    button.innerHTML =
+      visible ? eyeOpen : eyeClosed;
+
+    button.setAttribute(
+      'aria-label',
+      visible ? 'Mostrar senha' : 'Ocultar senha'
+    );
+  });
+});
+</script>
+
+</body>
+</html>
